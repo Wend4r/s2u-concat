@@ -68,7 +68,7 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%u", nValue);
+	sBuffer.AppendFormat("%u", nValue);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -77,7 +77,7 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%u", nValue);
+	sBuffer.AppendFormat("%u", nValue);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -86,7 +86,7 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%llu", ullValue);
+	sBuffer.AppendFormat("%llu", ullValue);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -95,7 +95,7 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%f", flValue);
+	sBuffer.AppendFormat("%f", flValue);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -104,7 +104,7 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 {
 	CBufferStringN<128> sBuffer;
 
-	sBuffer.Format("%.6f %.6f %.6f", vecValue.x, vecValue.y, vecValue.z);
+	sBuffer.AppendFormat("%.6f %.6f %.6f", vecValue.x, vecValue.y, vecValue.z);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -113,7 +113,7 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 {
 	CBufferStringN<128> sBuffer;
 
-	sBuffer.Format("%.6f %.6f %.6f", angValue.x, angValue.y, angValue.z);
+	sBuffer.AppendFormat("%.6f %.6f %.6f", angValue.x, angValue.y, angValue.z);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -161,7 +161,7 @@ const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, con
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%u", unHandle);
+	sBuffer.AppendFormat("%u", unHandle);
 
 	return AppendToBuffer(sMessage, pszKey, unHandle);
 }
@@ -170,7 +170,7 @@ const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, con
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%llu", uHandle);
+	sBuffer.AppendFormat("%llu", uHandle);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -184,7 +184,7 @@ const char *CConcatLineString::AppendPointerToBuffer(CBufferString &sMessage, co
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%p", pValue);
+	sBuffer.AppendFormat("%p", pValue);
 
 	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
@@ -207,7 +207,7 @@ const char *CConcatLineString::AppendKeyStringValuePointerToBuffer(CBufferString
 {
 	CBufferStringN<32> sBuffer;
 
-	sBuffer.Format("%p", pValue);
+	sBuffer.AppendFormat("%p", pValue);
 
 	const auto vecConcat = Base::GetKeyStringValueConcat(pszKey, sBuffer);
 
