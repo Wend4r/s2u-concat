@@ -34,6 +34,8 @@
 #	include <tier1/utlvector.h>
 #	include <mathlib/vector.h>
 
+#	define CONCAT_APPEND_VARIABLE(concatVar, bufferVar, var) concatVar.AppendPointerToBuffer(bufferVar, #var, var);
+
 template<class T>
 struct ConcatLine_t
 {
