@@ -204,7 +204,7 @@ public:
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, bool bValue) const;
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, int nValue) const;
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint nValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint64 nValue) const;
+	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint64 ullValue) const;
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, float flValue) const;
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, const Vector &vecValue) const;
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, const QAngle &angValue) const;
@@ -212,7 +212,7 @@ public:
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, const char *pszValue) const;
 	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, std::vector<const char *> vecValues) const;
 	const char *AppendBytesToBuffer(CBufferString &sMessage, const char *pszKey, const byte *pData, uintp nLength) const;
-	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint32 uHandle) const;
+	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint32 unHandle) const;
 	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint64 uHandle) const;
 	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, const void *pHandle) const;
 	const char *AppendPointerToBuffer(CBufferString &sMessage, const char *pszKey, const void *pValue) const;

@@ -22,6 +22,8 @@
 
 #include <concat.hpp>
 
+#include <stdio.h>
+
 const char *CConcatLineString::AppendHeadToBuffer(CBufferString &sMessage, const char *pszHeadKey) const
 {
 	const auto vecConcat = Base::GetHeadConcat(pszHeadKey);
@@ -64,56 +66,56 @@ const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const cha
 
 const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, int nValue) const
 {
-	char sValue[12];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sValue, sizeof(sValue), "%i", nValue);
+	sBuffer.Format("%u", nValue);
 
-	return AppendToBuffer(sMessage, pszKey, sValue);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint nValue) const
 {
-	char sValue[11];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sValue, sizeof(sValue), "%u", nValue);
+	sBuffer.Format("%u", nValue);
 
-	return AppendToBuffer(sMessage, pszKey, sValue);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
-const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint64 nValue) const
+const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint64 ullValue) const
 {
-	char sValue[21];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sValue, sizeof(sValue), "%llu", nValue);
+	sBuffer.Format("%llu", ullValue);
 
-	return AppendToBuffer(sMessage, pszKey, sValue);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, float flValue) const
 {
-	char sValue[24];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sValue, sizeof(sValue), "%f", flValue);
+	sBuffer.Format("%f", flValue);
 
-	return AppendToBuffer(sMessage, pszKey, sValue);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, const Vector &vecValue) const
 {
-	char sValue[72];
+	CBufferStringN<128> sBuffer;
 
-	V_snprintf(sValue, sizeof(sValue), "%.6f %.6f %.6f", vecValue.x, vecValue.y, vecValue.z);
+	sBuffer.Format("%.6f %.6f %.6f", vecValue.x, vecValue.y, vecValue.z);
 
-	return AppendToBuffer(sMessage, pszKey, sValue);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, const QAngle &angValue) const
 {
-	char sValue[72];
+	CBufferStringN<128> sBuffer;
 
-	V_snprintf(sValue, sizeof(sValue), "%.6f %.6f %.6f", angValue.x, angValue.y, angValue.z);
+	sBuffer.Format("%.6f %.6f %.6f", angValue.x, angValue.y, angValue.z);
 
-	return AppendToBuffer(sMessage, pszKey, sValue);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendToBuffer(CBufferString &sMessage, const char *pszKey, const char *pszValue) const
@@ -144,7 +146,7 @@ const char *CConcatLineString::AppendBytesToBuffer(CBufferString &sMessage, cons
 	{
 		auto *psByte = &psDataSet[n * nDepthSize];
 
-		V_snprintf(psByte, nDepthSize, "%02X ", pData[n]);
+		snprintf(psByte, nDepthSize, "%02X ", pData[n]);
 		vecValues.push_back(psByte);
 	}
 
@@ -155,22 +157,22 @@ const char *CConcatLineString::AppendBytesToBuffer(CBufferString &sMessage, cons
 	return pResult;
 }
 
-const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint32 uHandle) const
+const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint32 unHandle) const
 {
-	char sHandle[11];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sHandle, sizeof(sHandle), "%u", uHandle);
+	sBuffer.Format("%u", unHandle);
 
-	return AppendToBuffer(sMessage, pszKey, sHandle);
+	return AppendToBuffer(sMessage, pszKey, unHandle);
 }
 
 const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint64 uHandle) const
 {
-	char sHandle[21];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sHandle, sizeof(sHandle), "%llu", uHandle);
+	sBuffer.Format("%llu", uHandle);
 
-	return AppendToBuffer(sMessage, pszKey, sHandle);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, const void *pHandle) const
@@ -180,11 +182,11 @@ const char *CConcatLineString::AppendHandleToBuffer(CBufferString &sMessage, con
 
 const char *CConcatLineString::AppendPointerToBuffer(CBufferString &sMessage, const char *pszKey, const void *pValue) const
 {
-	char sPointer[19];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sPointer, sizeof(sPointer), "%p", pValue);
+	sBuffer.Format("%p", pValue);
 
-	return AppendToBuffer(sMessage, pszKey, sPointer);
+	return AppendToBuffer(sMessage, pszKey, sBuffer);
 }
 
 const char *CConcatLineString::AppendStringToBuffer(CBufferString &sMessage, const char *pszKey, const char *pszValue) const
@@ -203,11 +205,11 @@ const char *CConcatLineString::AppendKeyStringValueStringToBuffer(CBufferString 
 
 const char *CConcatLineString::AppendKeyStringValuePointerToBuffer(CBufferString &sMessage, const char *pszKey, const void *pValue) const
 {
-	char sPointer[19];
+	CBufferStringN<32> sBuffer;
 
-	V_snprintf(sPointer, sizeof(sPointer), "%p", pValue);
+	sBuffer.Format("%p", pValue);
 
-	const auto vecConcat = Base::GetKeyStringValueConcat(pszKey, sPointer);
+	const auto vecConcat = Base::GetKeyStringValueConcat(pszKey, sBuffer);
 
 	return sMessage.AppendConcat(vecConcat.size(), vecConcat.data(), NULL);
 }
