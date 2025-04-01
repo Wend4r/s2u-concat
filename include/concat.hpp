@@ -230,6 +230,9 @@ public:
 
 class ConcatLineString final : public CConcatLineString
 {
+public:
+	using CBase = CConcatLineString;
+	using CBase::CBase;
 }; // ConcatLineString
 
 // Globals.
