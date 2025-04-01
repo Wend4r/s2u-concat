@@ -1,0 +1,6 @@
+# Workspaces.
+/.vs
+
+# Build files. Must be published in Releases or Artifacts.
+/build*
+/cmake-build*
