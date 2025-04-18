@@ -236,7 +236,7 @@ public:
 }; // ConcatLineString
 
 // Globals.
-extern const std::array<const ConcatLineString, 8> g_arrEmbedsConcat;
+extern const std::array<const CConcatLineString, 8> g_arrEmbedsConcat;
 
 // Bcompatibility.
 #define g_aEmbedConcat g_arrEmbedsConcat[0]
