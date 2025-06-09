@@ -154,35 +154,12 @@ public:
 	using Impl::Impl;
 
 public:
-	const char *GetHeadsWith() const
-	{
-		return m_aHeadsWith;
-	}
-
-	const char *GetStartsWith() const
-	{
-		return m_aStartsWith;
-	}
-
-	const char *GetBefore() const
-	{
-		return m_aBefore;
-	}
-
-	const char *GetBetween() const
-	{
-		return m_aBetween;
-	}
-
-	const char *GetEnds() const
-	{
-		return m_aEnds;
-	}
-
-	const char *GetEndsAndStartsWith() const
-	{
-		return m_aEndsAndStartsWith;
-	}
+	const char *GetHeadsWith() const { return m_aHeadsWith; }
+	const char *GetStartsWith() const { return m_aStartsWith; }
+	const char *GetBefore() const { return m_aBefore; }
+	const char *GetBetween() const { return m_aBetween; }
+	const char *GetEnds() const { return m_aEnds; }
+	const char *GetEndsAndStartsWith() const { return m_aEndsAndStartsWith; }
 }; // CConcatLineStringBase
 
 class CConcatLineString : public CConcatLineStringBase
