@@ -51,7 +51,6 @@ include(cmake/sourcesdk.cmake)
 
 set(SOURCE_FILES
 	${SOURCE_CONCAT_DIR}/globals.cpp
-	${SOURCE_DIR}/concat.cpp
 )
 
 set(INCLUDE_DIRS

@@ -24,32 +24,34 @@
 
 #	pragma once
 
+#	include "concat/traits.hpp"
+
 #	include <stddef.h>
 
 #	include <array>
-#	include <vector>
 
 #	include <tier0/platform.h>
 #	include <tier0/bufferstring.h>
 #	include <tier1/utlvector.h>
 #	include <mathlib/vector.h>
+#	include <mathlib/vector4d.h>
 
-#	define CONCAT_APPEND_VARIABLE(concatVar, bufferVar, var) concatVar.AppendPointerToBuffer(bufferVar, #var, var);
+#	define CONCAT_APPEND_VARIABLE(concat, var) concat.Append(#var, var);
+
+class CConcatLineString;
+
+// Globals.
+extern const std::array<const CConcatLineString, 8> g_arrEmbedsConcat;
+
+// Aliases.
+#define g_aRootConcat   g_arrEmbedsConcat[0]
+#define g_aEmbedConcat  g_arrEmbedsConcat[1] // Single indent.
+#define g_aEmbed2Concat g_arrEmbedsConcat[2] // Double indent.
+#define g_aEmbed3Concat g_arrEmbedsConcat[3] // Triple indent.
 
 template<class T>
 struct ConcatLine_t
 {
-	ConcatLine_t(const T &aHeadsWith, const T &aStartsWith, const T &aBefore, const T &aBetween, const T &aEnds, const T &aEndsAndStartsWith)
-	 :  m_aHeadsWith(aHeadsWith), 
-	    m_aStartsWith(aStartsWith), 
-	    m_aBefore(aBefore), 
-	    m_aBetween(aBetween), 
-	    m_aEnds(aEnds), 
-	    m_aEndsAndStartsWith(aEndsAndStartsWith)
-	{
-	}
-
-	T m_aHeadsWith;
 	T m_aStartsWith;
 	T m_aBefore;
 	T m_aBetween;
@@ -58,49 +60,17 @@ struct ConcatLine_t
 }; // ConcatLine_t<T>
 
 template<class T>
-class CConcatLineStringImpl : public ConcatLine_t<T>
+class CConcatLineBase : public ConcatLine_t<T>
 {
 public:
 	using Base_t = ConcatLine_t<T>;
 	using Base_t::Base_t;
-	CConcatLineStringImpl(const Base_t &&aBase)
-	 :  Base_t(aBase)
-	{
-	}
 
-protected:
+	CConcatLineBase(Base_t &&aBase) : Base_t(Move(aBase)) {}
+
+public:
 	template<bool INSERT_BEFORE = true>
-	inline auto GetHeadConcat(const T &aHead) const
-	{
-		std::array<T, 3 + INSERT_BEFORE> arrResult {Base_t::m_aHeadsWith, aHead};
-
-		if constexpr (INSERT_BEFORE)
-		{
-			arrResult[2] = Base_t::m_aBefore;
-		}
-
-		arrResult[2 + INSERT_BEFORE] = Base_t::m_aEnds;
-
-		return arrResult;
-	}
-
-	template<bool INSERT_BEFORE = true>
-	inline auto GetStringHeadConcat(const T &aHead) const
-	{
-		std::array<T, 5 + INSERT_BEFORE> arrResult {Base_t::m_aHeadsWith, "\"", aHead, "\""};
-
-		if constexpr (INSERT_BEFORE)
-		{
-			arrResult[4] = Base_t::m_aBefore;
-		}
-
-		arrResult[4 + INSERT_BEFORE] = Base_t::m_aEnds;
-
-		return arrResult;
-	}
-
-	template<bool INSERT_BEFORE = true>
-	inline auto GetKeyConcat(const T &aKey) const
+	auto GetKey(const T &aKey) const
 	{
 		std::array<T, 3 + INSERT_BEFORE> arrResult {Base_t::m_aStartsWith, aKey};
 
@@ -114,95 +84,186 @@ protected:
 		return arrResult;
 	}
 
-	inline std::array<T, 5> GetKeyValueConcat(const T &aKey, const T &aValue) const
+	template<bool INSERT_BEFORE = true>
+	auto GetKeyString(const T &aKey) const
+	{
+		std::array<T, 5 + INSERT_BEFORE> arrResult {Base_t::m_aStartsWith, "\"", aKey, "\""};
+
+		if constexpr (INSERT_BEFORE)
+		{
+			arrResult[4] = Base_t::m_aBefore;
+		}
+
+		arrResult[4 + INSERT_BEFORE] = Base_t::m_aEnds;
+
+		return arrResult;
+	}
+
+	std::array<T, 5> GetKeyValue(const T &aKey, const T &aValue) const
 	{
 		return {Base_t::m_aStartsWith, aKey, Base_t::m_aBetween, aValue, Base_t::m_aEnds};
 	}
 
-	inline auto GetKeyValueConcat(const T &aKey, const std::vector<T> &vecValues) const
-	{
-		std::vector<T> vecResult = {Base_t::m_aStartsWith, aKey, Base_t::m_aBetween};
-
-		vecResult.insert(vecResult.cend(), vecValues.cbegin(), vecValues.cend());
-		vecResult.push_back(Base_t::m_aEnds);
-
-		return vecResult;
-	}
-
-	inline std::array<T, 7> GetKeyStringValueConcat(const T &aKey, const T &aValue) const
-	{
-		return {Base_t::m_aStartsWith, "\"", aKey, "\"", Base_t::m_aBetween, aValue, Base_t::m_aEnds};
-	}
-
-	inline std::array<T, 7> GetKeyValueStringConcat(const T &aKey, const T &aValue) const
+	std::array<T, 7> GetKeyValueString(const T &aKey, const T &aValue) const
 	{
 		return {Base_t::m_aStartsWith, aKey, Base_t::m_aBetween, "\"", aValue, "\"", Base_t::m_aEnds};
 	}
 
-	inline std::array<T, 9> GetKeyStringValueStringConcat(const T &aKey, const T &aValue) const
+	std::array<T, 7> GetKeyStringValue(const T &aKey, const T &aValue) const
+	{
+		return {Base_t::m_aStartsWith, "\"", aKey, "\"", Base_t::m_aBetween, aValue, Base_t::m_aEnds};
+	}
+
+	std::array<T, 9> GetKeyStringValueString(const T &aKey, const T &aValue) const
 	{
 		return {Base_t::m_aStartsWith, "\"", aKey, "\"", Base_t::m_aBetween, "\"", aValue, "\"", Base_t::m_aEnds};
 	}
-}; // CConcatLineStringImpl<T>
-
-using CConcatLineStringBaseImpl = CConcatLineStringImpl<const char *>;
-
-class CConcatLineStringBase : public CConcatLineStringBaseImpl
-{
-public:
-	using Impl = CConcatLineStringBaseImpl;
-	using Impl::Impl;
 
 public:
-	const char *GetHeadsWith() const { return m_aHeadsWith; }
-	const char *GetStartsWith() const { return m_aStartsWith; }
-	const char *GetBefore() const { return m_aBefore; }
-	const char *GetBetween() const { return m_aBetween; }
-	const char *GetEnds() const { return m_aEnds; }
-	const char *GetEndsAndStartsWith() const { return m_aEndsAndStartsWith; }
-}; // CConcatLineStringBase
+	template<bool IS_STRING = false, bool INSERT_BEFORE = true>
+	std::array<T, 3 + IS_STRING * 2 + INSERT_BEFORE> GetKey2(const T &aKey) const
+	{
+		if constexpr (IS_STRING)
+		{
+			return GetKeyString<INSERT_BEFORE>(aKey);
+		}
+
+		return GetKey<INSERT_BEFORE>(aKey);
+	}
+
+	template<bool KEY_STRING = false, bool VALUE_STRING = false>
+	constexpr std::array<T, 5 + (KEY_STRING + VALUE_STRING) * 2> GetKeyValue2(const T &aKey, const T &aValue) const
+	{
+		if constexpr (KEY_STRING && VALUE_STRING)
+		{
+			return GetKeyStringValueString(aKey, aValue);
+		}
+		else if constexpr (KEY_STRING)
+		{
+			return GetKeyStringValue(aKey, aValue);
+		}
+		else if constexpr (VALUE_STRING)
+		{
+			return GetKeyValueString(aKey, aValue);
+		}
+		else
+		{
+			return GetKeyValue(aKey, aValue);
+		}
+	}
+}; // CConcatLineBase<T>
+
+using CConcatLineStringBase = CConcatLineBase<const char *>;
 
 class CConcatLineString : public CConcatLineStringBase
 {
 public:
-	using Base = CConcatLineStringBase;
-	using Base::Base;
-	using Base::GetHeadsWith;
-	using Base::GetStartsWith;
-	using Base::GetBefore;
-	using Base::GetBetween;
-	using Base::GetEnds;
-	using Base::GetEndsAndStartsWith;
+	using CBase = CConcatLineStringBase;
+	using CBase::CBase;
 
 public:
-	const char *AppendHeadToBuffer(CBufferString &sMessage, const char *pszHeadKey) const;
-	const char *AppendStringHeadToBuffer(CBufferString &sMessage, const char *pszHeadKey) const;
-	const char *AppendStringHeadWithoutBeforeToBuffer(CBufferString &sMessage, const char *pszHeadKey) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey) const;
-	const char *AppendWithoutBeforeToBuffer(CBufferString &sMessage, const char *pszKey) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, bool bValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, int nValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint nValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, uint64 ullValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, float flValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, const Vector &vecValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, const QAngle &angValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, double dblValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, const char *pszValue) const;
-	const char *AppendToBuffer(CBufferString &sMessage, const char *pszKey, std::vector<const char *> vecValues) const;
-	const char *AppendBytesToBuffer(CBufferString &sMessage, const char *pszKey, const byte *pData, uintp nLength) const;
-	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint32 unHandle) const;
-	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, uint64 uHandle) const;
-	const char *AppendHandleToBuffer(CBufferString &sMessage, const char *pszKey, const void *pHandle) const;
-	const char *AppendPointerToBuffer(CBufferString &sMessage, const char *pszKey, const void *pValue) const;
-	const char *AppendStringToBuffer(CBufferString &sMessage, const char *pszKey, const char *pszValue) const;
-	const char *AppendKeyStringValueStringToBuffer(CBufferString &sMessage, const char *pszKey, const char *pszValue) const;
-	const char *AppendKeyStringValuePointerToBuffer(CBufferString &sMessage, const char *pszKey, const void *pValue) const;
-	const char *AppendEndsToBuffer(CBufferString &sMessage) const;
-	const char *AppendEndsAndStartsToBuffer(CBufferString &sMessage) const;
+	const char *GetStartsWith() const        { return m_aStartsWith; }
+	const char *GetBefore() const            { return m_aBefore; }
+	const char *GetBetween() const           { return m_aBetween; }
+	const char *GetEnds() const              { return m_aEnds; }
+	const char *GetEndsAndStartsWith() const { return m_aEndsAndStartsWith; }
+}; // CConcatLineString
 
-	int AppendToVector(CUtlVector<const char *> vecMessage, const char *pszKey, const char *pszValue) const;
-	int AppendStringToVector(CUtlVector<const char *> vecMessage, const char *pszKey, const char *pszValue) const;
+class CConcatLineBuffer
+{
+public:
+	CConcatLineBuffer(const CConcatLineString *pData, CBufferString *pBuffer) : m_pData(pData), m_pBuffer(pBuffer) {}
+
+public:
+	template<bool IS_STRING = false, bool INSERT_BEFORE = true>
+	const char *Append(const char *pszKey)
+	{
+		const auto vecConcat = m_pData->GetKey2<IS_STRING, INSERT_BEFORE>(pszKey);
+
+		return m_pBuffer->AppendConcat(vecConcat.size(), vecConcat.data());
+	}
+
+	template<bool KEY_STRING = false, bool VALUE_STRING = false, typename T>
+	const char *Append(const char *pszKey, T aValue)
+	{
+		CBufferStringN<256> sValue;
+
+		constexpr const char *pszFormat = k_bIsConcatPointer<T> ? k_pConcatFormat<void *> : k_pConcatFormat<T>;
+
+		if constexpr (pszFormat)
+		{
+			sValue.Format(pszFormat, aValue);
+		}
+		else if constexpr (k_bIsSameConcatType<T, Vector2D>)
+		{
+			sValue.Format("%f %f", aValue[0], aValue[1]);
+		}
+		else if constexpr (k_bIsSameConcatType<T, Vector> || k_bIsSameConcatType<T, QAngle>)
+		{
+			sValue.Format("%f %f %f", aValue[0], aValue[1], aValue[2]);
+		}
+		else if constexpr (k_bIsSameConcatType<T, Vector4D>)
+		{
+			sValue.Format("%f %f %f %f", aValue[0], aValue[1], aValue[2], aValue[3]);
+		}
+		else
+		{
+			sValue = "<unkown type>";
+		}
+
+		const auto vecConcat = m_pData->GetKeyValue2<KEY_STRING, VALUE_STRING>(pszKey, sValue.String());
+
+		return m_pBuffer->AppendConcat(vecConcat.size(), vecConcat.data());
+	}
+
+	template<bool KEY_STRING = false, bool VALUE_STRING = false>
+	const char *AppendBytes(const char *pszKey, const byte *pData, uintp nLength)
+	{
+		constexpr size_t nStrByteSize = 3;
+
+		char *psDataSet = new char[nLength * nStrByteSize + 1];
+
+		for(int n = 0; n < nLength; n++)
+		{
+			char *psByte = &psDataSet[n * nStrByteSize];
+
+			snprintf(psByte, nStrByteSize + 1, "%02X ", pData[n]);
+		}
+
+		auto *pResult = Append<KEY_STRING, VALUE_STRING>(pszKey, psDataSet);
+
+		delete[] psDataSet;
+
+		return pResult;
+	}
+
+	template<bool KEY_STRING = false, bool VALUE_STRING = false, typename T>
+	const char *AppendHandle(const char *pszKey, T aHandle)
+	{
+		CBufferStringN<16> sValue;
+
+		constexpr const char *pszFormat = k_pConcatFormatHandle<T>;
+
+		if constexpr (pszFormat)
+		{
+			sValue.Format(pszFormat, k_bIsConcatPointer<T> ? reinterpret_cast<uintp>(aHandle) : aHandle);
+		}
+		else
+		{
+			sValue = "<unknown handle type>";
+		}
+
+		const auto vecConcat = m_pData->GetKeyValue2<KEY_STRING, VALUE_STRING>(pszKey, sValue.String());
+
+		return m_pBuffer->AppendConcat(vecConcat.size(), vecConcat.data());
+	}
+
+	const char *AppendEnds()                { return m_pBuffer->Append(m_pData->GetEnds(), -1); }
+	const char *AppendEndsAndStartsWith()   { return m_pBuffer->Append(m_pData->GetEndsAndStartsWith(), -1); }
+
+private:
+	const CConcatLineString *m_pData;
+	CBufferString *m_pBuffer;
 }; // CConcatLineString
 
 class ConcatLineString final : public CConcatLineString
@@ -211,13 +272,5 @@ public:
 	using CBase = CConcatLineString;
 	using CBase::CBase;
 }; // ConcatLineString
-
-// Globals.
-extern const std::array<const CConcatLineString, 8> g_arrEmbedsConcat;
-
-// Bcompatibility.
-#define g_aEmbedConcat g_arrEmbedsConcat[0]
-#define g_aEmbed2Concat g_arrEmbedsConcat[1] // Next nesting.
-#define g_aEmbed3Concat g_arrEmbedsConcat[2] // Next nesting after the double.
 
 #endif // _INCLUDE_CONCAT_HPP_
