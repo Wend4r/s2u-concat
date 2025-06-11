@@ -179,7 +179,7 @@ public:
 
 public:
 	template<bool IS_STRING = false, bool INSERT_BEFORE = true>
-	const char *Append(const char *pszKey)
+	const char *Append(const char *pszKey) const
 	{
 		const auto vecConcat = m_pData->GetKey2<IS_STRING, INSERT_BEFORE>(pszKey);
 
@@ -187,7 +187,7 @@ public:
 	}
 
 	template<bool KEY_STRING = false, bool VALUE_STRING = false, typename T>
-	const char *Append(const char *pszKey, T aValue)
+	const char *Append(const char *pszKey, T aValue) const
 	{
 		CBufferStringN<256> sValue;
 
@@ -220,7 +220,7 @@ public:
 	}
 
 	template<bool KEY_STRING = false, bool VALUE_STRING = false>
-	const char *AppendBytes(const char *pszKey, const byte *pData, uintp nLength)
+	const char *AppendBytes(const char *pszKey, const byte *pData, uintp nLength) const
 	{
 		constexpr size_t nStrByteSize = 3;
 
@@ -241,7 +241,7 @@ public:
 	}
 
 	template<bool KEY_STRING = false, bool VALUE_STRING = false, typename T>
-	const char *AppendHandle(const char *pszKey, T aHandle)
+	const char *AppendHandle(const char *pszKey, T aHandle) const
 	{
 		CBufferStringN<16> sValue;
 
@@ -261,8 +261,8 @@ public:
 		return m_pBuffer->AppendConcat(vecConcat.size(), vecConcat.data());
 	}
 
-	const char *AppendEnds()                { return m_pBuffer->Append(m_pData->GetEnds(), -1); }
-	const char *AppendEndsAndStartsWith()   { return m_pBuffer->Append(m_pData->GetEndsAndStartsWith(), -1); }
+	const char *AppendEnds() const              { return m_pBuffer->Append(m_pData->GetEnds(), -1); }
+	const char *AppendEndsAndStartsWith() const { return m_pBuffer->Append(m_pData->GetEndsAndStartsWith(), -1); }
 
 private:
 	const CConcatLineString *m_pData;
