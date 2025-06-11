@@ -175,6 +175,9 @@ public:
 	CConcatLineBuffer(const CConcatLineString *pData, CBufferString *pBuffer) : m_pData(pData), m_pBuffer(pBuffer) {}
 
 public:
+	const CConcatLineString *GetData() const { return m_pData; }
+
+public:
 	template<bool IS_STRING = false, bool INSERT_BEFORE = true>
 	const char *Append(const char *pszKey)
 	{
