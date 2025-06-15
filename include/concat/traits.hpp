@@ -31,6 +31,7 @@ template<typename, typename>    inline constexpr bool k_bIsSameConcatType = fals
 template<typename T>            inline constexpr bool k_bIsSameConcatType<T, T> = true;
 
 template<class>                 inline constexpr bool k_bIsConcatPointer = false;
+template<>                      inline constexpr bool k_bIsConcatPointer<char *> = false;
 template<>                      inline constexpr bool k_bIsConcatPointer<const char *> = false;
 template<typename T>            inline constexpr bool k_bIsConcatPointer<T *> = true;
 template<typename T>            inline constexpr bool k_bIsConcatPointer<T * const> = true;
@@ -62,6 +63,7 @@ template<> inline constexpr const char *k_pConcatFormat<float64> =          "%lf
 
 // String.
 template<> inline constexpr const char *k_pConcatFormat<char> =             "%c";
+template<> inline constexpr const char *k_pConcatFormat<char *> =           "%s";
 template<> inline constexpr const char *k_pConcatFormat<const char *> =     "%s";
 template<> inline constexpr const char *k_pConcatFormat<CUtlString> =       "%s";
 template<> inline constexpr const char *k_pConcatFormat<CBufferString> =    "%s";
