@@ -209,6 +209,13 @@ public:
 		{
 			sValue.Format("%f %f %f %f", aValue[0], aValue[1], aValue[2], aValue[3]);
 		}
+		else if constexpr (k_bIsSameConcatType<T, bool>)
+		{
+			if (aValue)
+				sValue = "true";
+			else
+				sValue = "false";
+		}
 		else
 		{
 			sValue = "<unkown type>";
