@@ -193,7 +193,7 @@ public:
 
 		constexpr const char *pszFormat = k_bIsConcatPointer<T> ? k_pConcatFormat<void *> : k_pConcatFormat<T>;
 
-		if constexpr (pszFormat)
+		if constexpr (pszFormat != nullptr)
 		{
 			sValue.Format(pszFormat, aValue);
 		}
